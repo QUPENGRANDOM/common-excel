@@ -1,4 +1,4 @@
-package pengq.common.excel.commonexcelstarter;
+package pengq.common.excel;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

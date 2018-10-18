@@ -1,4 +1,4 @@
-package pengq.common.excel.commonexcelstarter;
+package pengq.common.excel;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
