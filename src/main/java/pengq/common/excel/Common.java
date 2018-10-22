@@ -1,6 +1,6 @@
 package pengq.common.excel;
 
-import pengq.common.excel.annotation.Cell;
+import pengq.common.excel.annotation.ReadCell;
 import pengq.common.excel.annotation.WorkBookReader;
 import pengq.common.excel.model.EXCell;
 
@@ -17,13 +17,13 @@ import pengq.common.excel.model.EXCell;
  */
 @WorkBookReader
 public class Common {
-    @Cell(cell = EXCell.A, target = String.class)
+    @ReadCell(readCell = EXCell.A, target = String.class)
     private String name;
 
-    @Cell(cell = EXCell.B, target = Integer.class)
+    @ReadCell(readCell = EXCell.B, target = Integer.class)
     private Integer value;
 
-    @Cell(cell = EXCell.C, target = String.class)
+    @ReadCell(readCell = EXCell.C, target = String.class)
     private String location;
 
     public String getName() {

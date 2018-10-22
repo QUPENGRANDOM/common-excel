@@ -3,13 +3,16 @@ package pengq.common.excel;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import pengq.common.excel.annotation.WorkBookReader;
-import pengq.common.excel.model.EXCell;
-import pengq.common.excel.utils.FieldUtil;
+import pengq.common.excel.model.FieldSummary;
+import pengq.common.excel.utils.FieldParseUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * FileName:     ExcelReader
@@ -23,20 +26,20 @@ import java.util.*;
  * @author: pengq
  */
 
-public class ExcelReader<T> {
+public class ExcelReader {
     private Workbook wb;
 
     public ExcelReader(String fullName) throws IOException {
-        wb = WorkbookFactory.create(new FileInputStream("D:\\logs\\黑龙江省红星合作店明细清单.xlsx"));
+        wb = WorkbookFactory.create(new FileInputStream(fullName));
     }
 
-    public List<T> read(Class<T> clazz) {
+    public <T> List<T> read(Class<T> clazz) {
         int startRow = 0;
         WorkBookReader reader = clazz.getAnnotation(WorkBookReader.class);
         if (reader != null) {
             startRow = reader.startRow();
         }
-        Map<String, FieldSummary> map = parseClassInfo(clazz);
+        Map<String, FieldSummary> map = FieldParseUtil.parse(clazz);
 
         int sheetNumber = wb.getNumberOfSheets();
         List<T> list = new ArrayList<>();
@@ -54,10 +57,6 @@ public class ExcelReader<T> {
         return list;
     }
 
-    public Workbook getWorkbook() {
-        return wb;
-    }
-
     public void closeWorkbook() {
         if (wb != null) {
             try {
@@ -67,7 +66,7 @@ public class ExcelReader<T> {
         }
     }
 
-    private T buildFromRow(Row row, Map<String, FieldSummary> fieldSummaryMap, Class<T> clazz) {
+    private <T> T buildFromRow(Row row, Map<String, FieldSummary> fieldSummaryMap, Class<T> clazz) {
         if (clazz == null) {
             return null;
         }
@@ -106,7 +105,6 @@ public class ExcelReader<T> {
         return t;
     }
 
-
     private Object getCellValue(Cell cell, FieldSummary summary) {
         Class<?> clazz = summary.getFieldType();
         Object value = null;
@@ -140,71 +138,4 @@ public class ExcelReader<T> {
 
         return value;
     }
-
-    private Map<String, FieldSummary> parseClassInfo(Class<?> clazz) {
-        Map<String, FieldSummary> fieldMapper = new HashMap<>();
-        Field[] fields = FieldUtil.getFields(clazz);
-        for (Field field : fields) {
-            pengq.common.excel.annotation.Cell cellAnnotation = field.getAnnotation(pengq.common.excel.annotation.Cell.class);
-            if (cellAnnotation == null) {
-                continue;
-            }
-
-            FieldSummary fieldSummary = new FieldSummary();
-            Class<?> fieldType = cellAnnotation.target();
-            if (fieldType == pengq.common.excel.annotation.Cell.Null.class) {
-                fieldType = field.getType();
-            }
-
-            String fieldName = field.getName();
-            EXCell exCell = cellAnnotation.cell();
-
-            fieldSummary.setFieldType(fieldType);
-            fieldSummary.setFieldName(fieldName);
-            fieldSummary.setExCell(exCell);
-            fieldMapper.put(exCell.name(), fieldSummary);
-        }
-
-        return fieldMapper;
-    }
-
-
-    protected class FieldSummary {
-        private String fieldName;
-        private Class<?> fieldType;
-        private EXCell exCell;
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public void setFieldName(String fieldName) {
-            this.fieldName = fieldName;
-        }
-
-        public Class<?> getFieldType() {
-            return fieldType;
-        }
-
-        public void setFieldType(Class<?> fieldType) {
-            this.fieldType = fieldType;
-        }
-
-        public EXCell getExCell() {
-            return exCell;
-        }
-
-        public void setExCell(EXCell exCell) {
-            this.exCell = exCell;
-        }
-    }
-
-    public static void main(String[] args) throws IOException {
-        long startTime = System.currentTimeMillis();
-
-        ExcelReader<Common> reader = new ExcelReader<>("D:\\logs\\黑龙江省红星合作店明细清单.xlsx");
-        List<Common> list = reader.read(Common.class);
-        System.out.println("end : " + (System.currentTimeMillis() - startTime));
-    }
-
 }

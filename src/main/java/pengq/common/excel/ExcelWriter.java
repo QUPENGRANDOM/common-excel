@@ -1,11 +1,11 @@
 package pengq.common.excel;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
 /**
  * FileName:     ExcelWriter
@@ -20,22 +20,11 @@ import java.io.FileOutputStream;
  */
 
 public class ExcelWriter {
-    private HSSFWorkbook workbook = new HSSFWorkbook();
-
+    private Workbook workbook;
     private FileOutputStream outputStream;
 
-    public void createSheet(){
-        workbook.createSheet();
-    }
-
-    public void createSheet(String name){
-        workbook.createSheet(name);
-
-        Sheet sheet = workbook.getSheetAt(0);
-        Row row = sheet.getRow(0);
-        Cell cell = row.getCell(0);
-
-        cell.getCellStyle();
+    public ExcelWriter(String path) throws IOException {
+        workbook = WorkbookFactory.create(new File(path));
     }
 
 
