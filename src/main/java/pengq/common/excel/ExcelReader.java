@@ -15,15 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * FileName:     ExcelReader
- *
- * @version V1.0
- * CreateDate:         2018/10/18 8:53
- * @Description: TODO(用一句话描述该文件做什么)
- * All rights Reserved, Designed By nuctech.ltd
- * Copyright:    Copyright(C) 2018-2028
- * Company       同方威视技术股份有限公司
- * @author: pengq
+ * Created by pengq on 2018/10/18 8:53
+ * Description:
  */
 
 public class ExcelReader {

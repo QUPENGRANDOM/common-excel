@@ -30,7 +30,7 @@ public class FieldUtil {
         }
     }
 
-    public static <T> T newInstance(Class<T> clazz, String[] properties, Object[] values) throws IllegalAccessException, InstantiationException, IntrospectionException, InvocationTargetException, NoSuchFieldException {
+    public static <T> T newInstance(Class<T> clazz, String[] properties, Object[] values) throws IllegalAccessException, InstantiationException,NoSuchFieldException {
         T t = clazz.newInstance();
         int length = values.length;
         for (int i = 0; i < properties.length; i++) {
