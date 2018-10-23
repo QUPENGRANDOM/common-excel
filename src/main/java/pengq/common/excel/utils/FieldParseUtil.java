@@ -15,7 +15,7 @@ import java.util.Map;
  */
 
 public class FieldParseUtil {
-    public static Map<String, FieldSummary> parse(Class<?> clazz){
+    public static Map<String, FieldSummary> parseReadCell(Class<?> clazz){
         Field[] fields = FieldUtil.getFields(clazz);
 
         Map<String, FieldSummary> fieldMapper = new HashMap<>(fields.length);

@@ -32,7 +32,7 @@ public class ExcelReader {
         if (reader != null) {
             startRow = reader.startRow();
         }
-        Map<String, FieldSummary> map = FieldParseUtil.parse(clazz);
+        Map<String, FieldSummary> map = FieldParseUtil.parseReadCell(clazz);
 
         int sheetNumber = wb.getNumberOfSheets();
         List<T> list = new ArrayList<>();
