@@ -2,7 +2,11 @@ package pengq.common.excel;
 
 import pengq.common.excel.annotation.ReadCell;
 import pengq.common.excel.annotation.WorkBookReader;
+import pengq.common.excel.annotation.WorkBookWriter;
+import pengq.common.excel.annotation.WriteCell;
 import pengq.common.excel.model.EXCell;
+
+import java.util.Date;
 
 /**
  * FileName:     Common
@@ -16,8 +20,10 @@ import pengq.common.excel.model.EXCell;
  * @author: pengq
  */
 @WorkBookReader
+@WorkBookWriter
 public class Common {
     @ReadCell(readCell = EXCell.A, target = String.class)
+    @WriteCell(writeCell = EXCell.A)
     private String name;
 
     @ReadCell(readCell = EXCell.B, target = Integer.class)
@@ -25,6 +31,9 @@ public class Common {
 
     @ReadCell(readCell = EXCell.C, target = String.class)
     private String location;
+
+    @WriteCell(writeCell = EXCell.A,dateformat = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime = new Date();
 
     public String getName() {
         return name;
@@ -48,5 +57,13 @@ public class Common {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

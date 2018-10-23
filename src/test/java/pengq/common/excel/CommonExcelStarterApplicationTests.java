@@ -20,6 +20,9 @@ public class CommonExcelStarterApplicationTests {
 		try {
 			reader = new ExcelReader("D:\\logs\\黑龙江省红星合作店明细清单.xlsx");
 			List<Common> list = reader.read(Common.class);
+
+			ExcelWriter excelWriter = new ExcelWriter("D:\\logs\\test.xlsx");
+			excelWriter.write(list);
 			System.out.println("end : " + (System.currentTimeMillis() - startTime));
 		} catch (IOException e) {
 			e.printStackTrace();
