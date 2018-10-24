@@ -30,9 +30,10 @@ public class Common {
     private Integer value;
 
     @ReadCell(readCell = EXCell.C, target = String.class)
+    @WriteCell(writeCell = EXCell.C)
     private String location;
 
-    @WriteCell(writeCell = EXCell.A,dateformat = "yyyy-MM-dd HH:mm:ss")
+    @WriteCell(writeCell = EXCell.B,dateFormat = "yyyy-MM-dd HH:mm:ss")
     private Date createTime = new Date();
 
     public String getName() {

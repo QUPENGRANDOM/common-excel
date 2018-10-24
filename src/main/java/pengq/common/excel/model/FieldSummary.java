@@ -9,6 +9,8 @@ public class FieldSummary {
     private String fieldName;
     private Class<?> fieldType;
     private EXCell exCell;
+    private String dateFormat;
+    private String doubleFormat;
 
     public String getFieldName() {
         return fieldName;
@@ -32,5 +34,21 @@ public class FieldSummary {
 
     public void setExCell(EXCell exCell) {
         this.exCell = exCell;
+    }
+
+    public String getDateFormat() {
+        return dateFormat;
+    }
+
+    public void setDateFormat(String dateFormat) {
+        this.dateFormat = dateFormat;
+    }
+
+    public String getDoubleFormat() {
+        return doubleFormat;
+    }
+
+    public void setDoubleFormat(String doubleFormat) {
+        this.doubleFormat = doubleFormat;
     }
 }

@@ -12,24 +12,34 @@ import java.util.List;
 @SpringBootTest
 public class CommonExcelStarterApplicationTests {
 
-	@Test
-	public void contextLoads() {
-		long startTime = System.currentTimeMillis();
+    @Test
+    public void contextLoads() {
+        long startTime = System.currentTimeMillis();
+        List<Common> list = null;
+        ExcelReader reader = null;
+        try {
+            reader = new ExcelReader("D:\\logs\\黑龙江省红星合作店明细清单.xlsx");
+            list = reader.read(Common.class);
+            System.out.println("end : " + (System.currentTimeMillis() - startTime));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                reader.closeWorkbook();
+            }
+        }
 
-		ExcelReader reader = null;
-		try {
-			reader = new ExcelReader("D:\\logs\\黑龙江省红星合作店明细清单.xlsx");
-			List<Common> list = reader.read(Common.class);
+        ExcelWriter excelWriter = null;
+        try {
+            excelWriter = new ExcelWriter("D:\\logs\\test.xlsx");
+            excelWriter.write("ceshi",list, Common.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (excelWriter != null) {
+                excelWriter.close();
+            }
+        }
 
-			ExcelWriter excelWriter = new ExcelWriter("D:\\logs\\test.xlsx");
-			excelWriter.write(list);
-			System.out.println("end : " + (System.currentTimeMillis() - startTime));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}finally {
-			if (reader != null){
-				reader.closeWorkbook();
-			}
-		}
-	}
+    }
 }

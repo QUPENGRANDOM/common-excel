@@ -1,13 +1,14 @@
 package pengq.common.excel.utils;
 
 import pengq.common.excel.annotation.ReadCell;
+import pengq.common.excel.annotation.WriteCell;
 import pengq.common.excel.model.EXCell;
 import pengq.common.excel.model.FieldSummary;
 import pengq.common.excel.model.Null;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by pengq on 2018/10/22 13:37
@@ -39,6 +40,41 @@ public class FieldParseUtil {
             fieldSummary.setFieldName(fieldName);
             fieldSummary.setExCell(exCell);
             fieldMapper.put(exCell.name(), fieldSummary);
+        }
+
+        return fieldMapper;
+    }
+
+    public static Map<String, FieldSummary> parseWriteCell(Class<?> clazz){
+        Field[] fields = FieldUtil.getFields(clazz);
+
+        Map<String, FieldSummary> fieldMapper = new HashMap<>(fields.length);
+
+        for (Field field : fields) {
+            WriteCell writeCellAnnotation = field.getAnnotation(WriteCell.class);
+            if (writeCellAnnotation == null) {
+                continue;
+            }
+
+            FieldSummary fieldSummary = new FieldSummary();
+            Class<?> fieldType = writeCellAnnotation.target();
+            if (fieldType == Null.class) {
+                fieldType = field.getType();
+            }
+
+            String fieldName = field.getName();
+            EXCell exCell = writeCellAnnotation.writeCell();
+
+            String dateFormat = writeCellAnnotation.dateFormat();
+            String doubleFormat = writeCellAnnotation.doubleFormat();
+
+            fieldSummary.setFieldType(fieldType);
+            fieldSummary.setFieldName(fieldName);
+            fieldSummary.setExCell(exCell);
+            fieldSummary.setDateFormat(dateFormat);
+            fieldSummary.setDoubleFormat(doubleFormat);
+
+            fieldMapper.put(fieldName,fieldSummary);
         }
 
         return fieldMapper;
