@@ -8,6 +8,7 @@ import pengq.common.excel.utils.FieldParseUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,6 +25,10 @@ public class ExcelReader {
 
     public ExcelReader(String fullName) throws IOException {
         wb = WorkbookFactory.create(new FileInputStream(fullName));
+    }
+
+    public ExcelReader(InputStream in) throws IOException {
+        wb = WorkbookFactory.create(in);
     }
 
     public <T> List<T> read(Class<T> clazz) {
