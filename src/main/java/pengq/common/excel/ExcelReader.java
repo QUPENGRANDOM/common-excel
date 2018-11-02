@@ -4,16 +4,15 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellReference;
 import pengq.common.excel.annotation.WorkBookReader;
 import pengq.common.excel.model.FieldSummary;
+import pengq.common.excel.model.MySheet;
+import pengq.common.excel.model.MyWorkbook;
 import pengq.common.excel.utils.FieldParseUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by pengq on 2018/10/18 8:53
@@ -53,6 +52,60 @@ public class ExcelReader {
         }
 
         return list;
+    }
+
+
+//    {
+//      "sheets":["sheet1", "sheet2" ],
+//      "sheetMapper":{
+//          "sheet1":{
+//              "cells":["a","b"],
+//              "rows":[
+//                   {
+//                     "a":"123123",
+//                     "b":1
+//                   }
+//                 ]
+//        },
+//        "sheet2":{
+//
+//        }
+//    }
+//    }
+
+    public MyWorkbook read() {
+        MyWorkbook myWorkbook = new MyWorkbook();
+        List<String> sheets = new ArrayList<>();
+        Map<String, MySheet> sheetMapper = new HashMap<>();
+
+        int sheetNumber = wb.getNumberOfSheets();
+        for (int i = 0; i < sheetNumber; i++) {
+            Sheet sheet = wb.getSheetAt(i);
+
+            sheets.add(sheet.getSheetName());
+
+            MySheet mySheet = new MySheet();
+
+            int rowNum = sheet.getLastRowNum();
+
+            List<String> cells = new ArrayList<>();
+            List<Map<String, Object>> rows = new ArrayList<>();
+
+            for (int j = 0; j < rowNum + 1; j++) {
+                Row row = sheet.getRow(j);
+                Map<String, Object> myRow = buildFromRow(row, cells);
+
+                rows.add(myRow);
+            }
+
+            mySheet.setCells(cells);
+            mySheet.setRows(rows);
+            sheetMapper.put(sheet.getSheetName(), mySheet);
+        }
+
+        myWorkbook.setSheetMapper(sheetMapper);
+        myWorkbook.setSheets(sheets);
+        return myWorkbook;
     }
 
     public void closeWorkbook() {
@@ -103,6 +156,27 @@ public class ExcelReader {
         return t;
     }
 
+    private Map<String, Object> buildFromRow(Row row, List<String> cells) {
+        Map<String, Object> myRow = new HashMap<>();
+        for (int i = 0; i < row.getLastCellNum() + 1; i++) {
+            Cell cell = row.getCell(i);
+            if (cell == null) continue;
+
+            CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
+            String value = cellRef.formatAsString();
+            int rowNum = cellRef.getRow();
+
+            String cellName = value.substring(0, value.length() - String.valueOf(rowNum + 1).length());
+            if (!cells.contains(cellName)) {
+                cells.add(cellName);
+            }
+
+            myRow.put(cellName, getCellValue(cell));
+        }
+
+        return myRow;
+    }
+
     private Object getCellValue(Cell cell, FieldSummary summary) {
         Class<?> clazz = summary.getFieldType();
         Object value = null;
@@ -134,6 +208,41 @@ public class ExcelReader {
                 break;
         }
 
+        return value;
+    }
+
+    private Object getCellValue(Cell cell) {
+        String value = "";
+        if (cell != null) {
+            switch (cell.getCellType()) {
+
+                case FORMULA:
+                    value = cell.getCellFormula();
+                    break;
+
+                case NUMERIC:
+                    value = String.valueOf(cell.getNumericCellValue());
+                    break;
+
+                case STRING:
+                    value = cell.getStringCellValue();
+                    break;
+
+                case BLANK:
+                    break;
+
+                case BOOLEAN:
+                    value = String.valueOf(cell.getBooleanCellValue());
+                    break;
+
+                case ERROR:
+                    value = String.valueOf(cell.getErrorCellValue());
+                    break;
+
+                default:
+                    break;
+            }
+        }
         return value;
     }
 }
