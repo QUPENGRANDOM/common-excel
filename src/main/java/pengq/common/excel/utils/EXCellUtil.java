@@ -9,13 +9,17 @@ import pengq.common.excel.model.EXCell;
 
 public class EXCellUtil {
     public static int getCellNumber(EXCell cell) {
-        // TODO: 2018/10/23 目前该方式不支持超过EXCEL Z 的列
-
         byte[] bytes = getAscii(cell);
+        byte position = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            position += (bytes[i] - 65 + (26 * i));
+        }
+        return position;
+    }
 
-        int ascii = bytes[0];
-
-        return ascii - 65;
+    public static int getCellNumber(String cell) {
+        EXCell exCell = EXCell.valueOf(cell);
+        return getCellNumber(exCell);
     }
 
     private static byte[] getAscii(EXCell exCell) {
