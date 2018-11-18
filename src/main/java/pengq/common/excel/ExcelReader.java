@@ -212,7 +212,7 @@ public class ExcelReader {
     }
 
     private Object getCellValue(Cell cell) {
-        String value = "";
+        Object value = "";
         if (cell != null) {
             switch (cell.getCellType()) {
 
@@ -221,9 +221,12 @@ public class ExcelReader {
                     break;
 
                 case NUMERIC:
-                    value = String.valueOf(cell.getNumericCellValue());
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        value = cell.getDateCellValue();
+                    }else {
+                        value = String.valueOf(cell.getNumericCellValue());
+                    }
                     break;
-
                 case STRING:
                     value = cell.getStringCellValue();
                     break;
