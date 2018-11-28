@@ -16,18 +16,31 @@ import java.util.*;
 
 /**
  * Created by pengq on 2018/10/18 8:53
- * Description:
+ * Description:线程不安全类
  */
 
 public class ExcelReader {
     private Workbook wb;
+    private int[] headerOfLine;
+    private Map<String, Object> headerMapper;
 
     public ExcelReader(String fullName) throws IOException {
-        wb = WorkbookFactory.create(new FileInputStream(fullName));
+        this(new FileInputStream(fullName));
     }
 
     public ExcelReader(InputStream in) throws IOException {
-        wb = WorkbookFactory.create(in);
+        this(in,null);
+    }
+
+    public ExcelReader(String fullName, int[] headerOfLine) throws IOException {
+        this(new FileInputStream(fullName), headerOfLine);
+    }
+
+    public ExcelReader(InputStream in, int[] headerOfLine) throws IOException {
+        this.wb = WorkbookFactory.create(in);
+        if (headerOfLine != null && headerOfLine.length != 0) {
+            this.headerOfLine = headerOfLine;
+        }
     }
 
     public <T> List<T> read(Class<T> clazz) {
@@ -54,25 +67,6 @@ public class ExcelReader {
         return list;
     }
 
-
-//    {
-//      "sheets":["sheet1", "sheet2" ],
-//      "sheetMapper":{
-//          "sheet1":{
-//              "cells":["a","b"],
-//              "rows":[
-//                   {
-//                     "a":"123123",
-//                     "b":1
-//                   }
-//                 ]
-//        },
-//        "sheet2":{
-//
-//        }
-//    }
-//    }
-
     public MyWorkbook read() {
         MyWorkbook myWorkbook = new MyWorkbook();
         List<String> sheets = new ArrayList<>();
@@ -81,6 +75,8 @@ public class ExcelReader {
         int sheetNumber = wb.getNumberOfSheets();
         for (int i = 0; i < sheetNumber; i++) {
             Sheet sheet = wb.getSheetAt(i);
+
+            headerMapper = new HashMap<>();
 
             sheets.add(sheet.getSheetName());
 
@@ -93,11 +89,17 @@ public class ExcelReader {
 
             for (int j = 0; j < rowNum + 1; j++) {
                 Row row = sheet.getRow(j);
+                if (headerOfLine!= null && headerOfLine[i] == j) {
+                    headerMapper = buildFromRow(row, cells);
+                    continue;
+                }
+
                 Map<String, Object> myRow = buildFromRow(row, cells);
 
                 rows.add(myRow);
             }
 
+            mySheet.setHeaders(headerMapper);
             mySheet.setCells(cells);
             mySheet.setRows(rows);
             sheetMapper.put(sheet.getSheetName(), mySheet);
@@ -223,7 +225,7 @@ public class ExcelReader {
                 case NUMERIC:
                     if (DateUtil.isCellDateFormatted(cell)) {
                         value = cell.getDateCellValue();
-                    }else {
+                    } else {
                         value = String.valueOf(cell.getNumericCellValue());
                     }
                     break;

@@ -16,9 +16,19 @@ import java.util.Map;
  */
 
 public class MySheet {
+    private Map<String,Object> headers;
+
     private List<String> cells;
 
     private List<Map<String,Object>> rows;
+
+    public Map<String, Object> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, Object> headers) {
+        this.headers = headers;
+    }
 
     public List<String> getCells() {
         return cells;
@@ -39,7 +49,8 @@ public class MySheet {
     @Override
     public String toString() {
         return "MySheet{" +
-                "cells=" + cells +
+                "headers=" + headers +
+                ", cells=" + cells +
                 ", rows=" + rows +
                 '}';
     }
