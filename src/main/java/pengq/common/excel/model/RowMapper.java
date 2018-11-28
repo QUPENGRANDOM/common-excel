@@ -1,8 +1,7 @@
-package pengq.common.excel;
+package pengq.common.excel.model;
 
 import com.sun.istack.internal.Nullable;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -20,5 +19,5 @@ import java.util.Map;
 @FunctionalInterface
 public interface RowMapper<T> {
     @Nullable
-    T mapRow(Map<String,Object> myRow, int rowNum);
+    T mapRow(ResultSet resultSet, int rowNum);
 }

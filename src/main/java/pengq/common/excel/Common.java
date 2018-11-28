@@ -5,6 +5,8 @@ import pengq.common.excel.annotation.WorkBookReader;
 import pengq.common.excel.annotation.WorkBookWriter;
 import pengq.common.excel.annotation.WriteCell;
 import pengq.common.excel.model.EXCell;
+import pengq.common.excel.model.ResultSet;
+import pengq.common.excel.model.RowMapper;
 
 import java.util.Date;
 import java.util.Map;
@@ -69,14 +71,12 @@ public class Common {
         this.createTime = createTime;
     }
 
-    private RowMapper<Common> rowMapper = new RowMapper<Common>() {
-        @Override
-        public Common mapRow(Map<String, Object> myRow, int rowNum) {
-            Common common = new Common();
-//            common.setCreateTime(myRow.getOrDefault(EXCell.A.toString(),new Date()));
-            return null;
-        }
-
-        java.sql.ResultSet resultSet;
+    private RowMapper<Common> rowMapper = (resultSet, rowNum) -> {
+        Common common = new Common();
+        common.setCreateTime(resultSet.getDate("createTime"));
+        common.setLocation(resultSet.getString("location"));
+        common.setName(resultSet.getString("name"));
+        common.setValue(resultSet.getInt("value"));
+        return common;
     };
 }
