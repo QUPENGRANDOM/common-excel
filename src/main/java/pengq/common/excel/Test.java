@@ -19,12 +19,12 @@ import java.io.IOException;
 public class Test {
     public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
-        ExcelReader reader = new ExcelReader("C:\\Users\\99400\\Desktop\\新建 Microsoft Excel 工作表 (3).xlsx");
+        ExcelReader reader = new ExcelReader("C:\\Users\\qupeng-ai003\\Documents\\WeChat Files\\xiaoyiyoushang\\Files\\工作簿1.xlsx",new int[]{0,0,0,0});
 
         MyWorkbook workbook = reader.read();
 
-        ExcelWriter writer = new ExcelWriter("C:\\Users\\99400\\Desktop\\xxxSSS.xlsx");
-        writer.write(workbook);
+//        ExcelWriter writer = new ExcelWriter("C:\\Users\\99400\\Desktop\\xxxSSS.xlsx");
+//        writer.write(workbook);
         System.out.println(System.currentTimeMillis() - start);
     }
 }
