@@ -33,8 +33,15 @@ public class FieldParseUtil {
                 fieldType = field.getType();
             }
 
+            String stringToDate = readCellAnnotation.stringToDate();
+            if (stringToDate.isEmpty()){
+                fieldSummary.setPattern(null);
+            }else {
+                fieldSummary.setPattern(stringToDate);
+            }
             String fieldName = field.getName();
             EXCell exCell = readCellAnnotation.readCell();
+
 
             fieldSummary.setFieldType(fieldType);
             fieldSummary.setFieldName(fieldName);

@@ -1,5 +1,7 @@
 package pengq.common.excel.model;
 
+import java.util.regex.Pattern;
+
 /**
  * Created by pengq on 2018/10/22 8:46
  * Description:
@@ -11,6 +13,7 @@ public class FieldSummary {
     private EXCell exCell;
     private String dateFormat;
     private String doubleFormat;
+    private String pattern;
 
     public String getFieldName() {
         return fieldName;
@@ -50,5 +53,13 @@ public class FieldSummary {
 
     public void setDoubleFormat(String doubleFormat) {
         this.doubleFormat = doubleFormat;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 }

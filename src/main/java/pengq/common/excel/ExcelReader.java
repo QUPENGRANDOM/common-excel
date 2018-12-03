@@ -7,11 +7,14 @@ import pengq.common.excel.model.FieldSummary;
 import pengq.common.excel.model.MySheet;
 import pengq.common.excel.model.MyWorkbook;
 import pengq.common.excel.utils.FieldParseUtil;
+import pengq.common.excel.utils.FieldUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -20,6 +23,7 @@ import java.util.*;
  */
 
 public class ExcelReader {
+    private SimpleDateFormat dateFormat = null;
     private Workbook wb;
     private int[] headerOfLine;
     private Map<String, Object> headerMapper;
@@ -29,7 +33,7 @@ public class ExcelReader {
     }
 
     public ExcelReader(InputStream in) throws IOException {
-        this(in,null);
+        this(in, null);
     }
 
     public ExcelReader(String fullName, int[] headerOfLine) throws IOException {
@@ -51,13 +55,15 @@ public class ExcelReader {
         }
         Map<String, FieldSummary> map = FieldParseUtil.parseReadCell(clazz);
 
+        Map<String, Field> fieldMap = FieldUtil.getFieldMapper(clazz);
+
         int sheetNumber = wb.getNumberOfSheets();
         List<T> list = new ArrayList<>();
         for (int i = 0; i < sheetNumber; i++) {
             Sheet sheet = wb.getSheetAt(i);
             int rowNum = sheet.getLastRowNum();
             for (int j = startRow; j < rowNum + 1; j++) {
-                T t = buildFromRow(sheet.getRow(j), map, clazz);
+                T t = buildFromRow(sheet.getRow(j), map, fieldMap, clazz);
                 if (t != null) {
                     list.add(t);
                 }
@@ -89,7 +95,7 @@ public class ExcelReader {
 
             for (int j = 0; j < rowNum + 1; j++) {
                 Row row = sheet.getRow(j);
-                if (headerOfLine!= null && headerOfLine[i] == j) {
+                if (headerOfLine != null && headerOfLine[i] == j) {
                     headerMapper = buildFromRow(row, cells);
                     continue;
                 }
@@ -119,7 +125,7 @@ public class ExcelReader {
         }
     }
 
-    private <T> T buildFromRow(Row row, Map<String, FieldSummary> fieldSummaryMap, Class<T> clazz) {
+    private <T> T buildFromRow(Row row, Map<String, FieldSummary> fieldSummaryMap,Map<String, Field> fieldMap, Class<T> clazz) {
         if (clazz == null) {
             return null;
         }
@@ -147,10 +153,10 @@ public class ExcelReader {
             FieldSummary fieldSummary = fieldSummaryMap.get(cellName);
 
             try {
-                Field field = clazz.getDeclaredField(fieldSummary.getFieldName());
+                Field field = fieldMap.get(fieldSummary.getFieldName());
                 field.setAccessible(true);
                 field.set(t, this.getCellValue(cell, fieldSummary));
-            } catch (NoSuchFieldException | IllegalAccessException e) {
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -184,14 +190,26 @@ public class ExcelReader {
         Object value = null;
         switch (cell.getCellType()) {
             case STRING:
-                value = clazz.cast(cell.getRichStringCellValue().getString());
+                if (clazz == Date.class) {
+                    if (dateFormat == null && summary.getPattern() != null) {
+                        dateFormat = new SimpleDateFormat(summary.getPattern());
+
+                        try {
+                            value = dateFormat.parse(cell.getRichStringCellValue().getString());
+                        } catch (ParseException ignored) {
+                        }
+                    }
+                } else {
+                    value = clazz.cast(cell.getRichStringCellValue().getString());
+                }
                 break;
             case NUMERIC:
-                if (DateUtil.isCellDateFormatted(cell) && clazz == Date.class) {
+                if (DateUtil.isCellDateFormatted(cell) && (clazz == Date.class || clazz == Object.class)) {
                     value = cell.getDateCellValue();
                 } else if (clazz == Integer.class) {
                     value = clazz.cast((int) cell.getNumericCellValue());
                 } else if (clazz == String.class) {
+                    cell.setCellType(CellType.STRING);
                     value = cell.getStringCellValue();
                 } else {
                     value = clazz.cast(cell.getNumericCellValue());

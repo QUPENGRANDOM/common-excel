@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by pengq on 2018/3/22 10:13
@@ -48,6 +50,18 @@ public class FieldUtil {
         field.setAccessible(true);
         field.set(t, value);
         return t;
+    }
+
+    public static Map<String,Field> getFieldMapper(Class clazz){
+        Field[] fields = getFields(clazz);
+
+        Map<String,Field> map = new HashMap<>();
+
+        for (Field f: fields) {
+            map.put(f.getName(),f);
+        }
+
+        return map;
     }
 
     public static Field[] getFields(Class clazz) {
