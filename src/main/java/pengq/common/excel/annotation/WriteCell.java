@@ -13,6 +13,8 @@ public @interface WriteCell {
 
     Class target() default Null.class;
 
+    String header() default "";
+
     String dateFormat() default "";
 
     String doubleFormat() default "";

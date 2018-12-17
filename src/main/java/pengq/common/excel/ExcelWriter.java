@@ -2,6 +2,7 @@ package pengq.common.excel;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import pengq.common.excel.annotation.EnableHeader;
 import pengq.common.excel.model.FieldSummary;
 import pengq.common.excel.model.MySheet;
 import pengq.common.excel.model.MyWorkbook;
@@ -25,7 +26,7 @@ public class ExcelWriter {
     private Workbook workbook = new XSSFWorkbook();
     private FileOutputStream outputStream;
 
-    private Map<String,CellStyle> cache = new HashMap<>();
+    private Map<String, CellStyle> cache = new HashMap<>();
 
     public ExcelWriter(String path) throws IOException {
         outputStream = new FileOutputStream(path);
@@ -49,11 +50,20 @@ public class ExcelWriter {
         Sheet sheet = sheetName == null || sheetName.isEmpty() ?
                 workbook.createSheet() : workbook.createSheet(sheetName);
 
+        //解析header
+        int startRow = 0;
+        EnableHeader enableHeader = clazz.getAnnotation(EnableHeader.class);
+        if (enableHeader != null) {
+            startRow = 1;
+            Row header = sheet.createRow(0);
+            writeHeader(header,FieldParseUtil.parseHeader(clazz));
+        }
+
         int length = list.size();
-        for (int i = 0; i < length; i++) {
+        for (int i = startRow; i < length + startRow; i++) {
             Row row = sheet.createRow(i);
             T t = list.get(i);
-            System.out.println("v:"+ t);
+            System.out.println("v:" + t);
             summaryMapper.forEach((key, value) -> {
                 int cellPosition = EXCellUtil.getCellNumber(value.getExCell());
                 Cell cell = row.createCell(cellPosition);
@@ -129,10 +139,10 @@ public class ExcelWriter {
         if (summary.getFieldType() == Date.class) {
             if (summary.getDateFormat() != null && !summary.getDateFormat().isEmpty()) {
                 cell.setCellType(CellType.STRING);
-                cell.setCellValue(value instanceof Date?format((Date) value, summary.getDateFormat()):"");
+                cell.setCellValue(value instanceof Date ? format((Date) value, summary.getDateFormat()) : "");
             } else {
                 cell.setCellType(CellType.NUMERIC);
-                cell.setCellValue(value instanceof Date?(Date) value:null);
+                cell.setCellValue(value instanceof Date ? (Date) value : null);
             }
         } else if (summary.getFieldType() == Double.class) {
             if (summary.getDoubleFormat() != null && !summary.getDoubleFormat().isEmpty()) {
@@ -163,8 +173,8 @@ public class ExcelWriter {
     }
 
     private CellStyle getCellStyle() {
-        final String commonStyleKey  = "common-style";
-        if (cache.containsKey(commonStyleKey)){
+        final String commonStyleKey = "common-style";
+        if (cache.containsKey(commonStyleKey)) {
             return cache.get(commonStyleKey);
         }
 
@@ -172,20 +182,20 @@ public class ExcelWriter {
         cellStyle.setAlignment(HorizontalAlignment.LEFT); //水平布局：居中
         cellStyle.setWrapText(false);
         cellStyle.setFont(getFontStyle());
-        cache.put(commonStyleKey,cellStyle);
+        cache.put(commonStyleKey, cellStyle);
         return cellStyle;
     }
 
     private CellStyle getDateCellStyle() {
-        final String dateStyleKey  = "date-style";
-        if (cache.containsKey(dateStyleKey)){
+        final String dateStyleKey = "date-style";
+        if (cache.containsKey(dateStyleKey)) {
             return cache.get(dateStyleKey);
         }
 
         CellStyle cellStyle = getCellStyle();
         short df = workbook.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss");
         cellStyle.setDataFormat(df);
-        cache.put(dateStyleKey,cellStyle);
+        cache.put(dateStyleKey, cellStyle);
         return cellStyle;
     }
 
@@ -208,6 +218,15 @@ public class ExcelWriter {
     private void sheetFormat(Sheet sheet, List<String> cells) {
         for (String cell : cells) {
             sheet.autoSizeColumn(Integer.parseInt(cell));
+        }
+    }
+
+    private void writeHeader(Row row, List<String> headers){
+        for (int i = 0; i< headers.size();i++){
+            Cell cell = row.createCell(i);
+            cell.setCellStyle(getCellStyle());
+            cell.setCellType(CellType.STRING);
+            cell.setCellValue(headers.get(i));
         }
     }
 }

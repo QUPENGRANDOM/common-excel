@@ -7,8 +7,7 @@ import pengq.common.excel.model.FieldSummary;
 import pengq.common.excel.model.Null;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by pengq on 2018/10/22 13:37
@@ -16,7 +15,7 @@ import java.util.Map;
  */
 
 public class FieldParseUtil {
-    public static Map<String, FieldSummary> parseReadCell(Class<?> clazz){
+    public static Map<String, FieldSummary> parseReadCell(Class<?> clazz) {
         Field[] fields = FieldUtil.getFields(clazz);
 
         Map<String, FieldSummary> fieldMapper = new HashMap<>(fields.length);
@@ -34,9 +33,9 @@ public class FieldParseUtil {
             }
 
             String stringToDate = readCellAnnotation.stringToDate();
-            if (stringToDate.isEmpty()){
+            if (stringToDate.isEmpty()) {
                 fieldSummary.setPattern(null);
-            }else {
+            } else {
                 fieldSummary.setPattern(stringToDate);
             }
             String fieldName = field.getName();
@@ -52,7 +51,7 @@ public class FieldParseUtil {
         return fieldMapper;
     }
 
-    public static Map<String, FieldSummary> parseWriteCell(Class<?> clazz){
+    public static Map<String, FieldSummary> parseWriteCell(Class<?> clazz) {
         Field[] fields = FieldUtil.getFields(clazz);
 
         Map<String, FieldSummary> fieldMapper = new HashMap<>(fields.length);
@@ -81,9 +80,25 @@ public class FieldParseUtil {
             fieldSummary.setDateFormat(dateFormat);
             fieldSummary.setDoubleFormat(doubleFormat);
 
-            fieldMapper.put(fieldName,fieldSummary);
+            fieldMapper.put(fieldName, fieldSummary);
         }
 
         return fieldMapper;
+    }
+
+    public static List<String> parseHeader(Class<?> clazz) {
+        Field[] fields = FieldUtil.getFields(clazz);
+        String[] array = new String[fields.length];
+        Arrays.fill(array, "");
+        List<String> headers = new ArrayList<>(Arrays.asList(array));
+        for (Field field : fields) {
+            WriteCell writeCellAnnotation = field.getAnnotation(WriteCell.class);
+            if (writeCellAnnotation == null) {
+                continue;
+            }
+            headers.add(writeCellAnnotation.header());
+        }
+
+        return headers;
     }
 }

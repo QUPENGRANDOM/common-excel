@@ -1,9 +1,6 @@
 package pengq.common.excel;
 
-import pengq.common.excel.annotation.ReadCell;
-import pengq.common.excel.annotation.WorkBookReader;
-import pengq.common.excel.annotation.WorkBookWriter;
-import pengq.common.excel.annotation.WriteCell;
+import pengq.common.excel.annotation.*;
 import pengq.common.excel.model.EXCell;
 import pengq.common.excel.model.ResultSet;
 import pengq.common.excel.model.RowMapper;
@@ -24,16 +21,17 @@ import java.util.Map;
  */
 @WorkBookReader
 @WorkBookWriter
+@EnableHeader
 public class Common {
     @ReadCell(readCell = EXCell.A, target = String.class)
-    @WriteCell(writeCell = EXCell.A)
+    @WriteCell(writeCell = EXCell.A,header = "eee")
     private String name;
 
     @ReadCell(readCell = EXCell.B, target = Integer.class)
     private Integer value;
 
     @ReadCell(readCell = EXCell.C, target = String.class)
-    @WriteCell(writeCell = EXCell.C)
+    @WriteCell(writeCell = EXCell.C,header = "aaa")
     private String location;
 
     @WriteCell(writeCell = EXCell.B,dateFormat = "yyyy-MM-dd HH:mm:ss")
