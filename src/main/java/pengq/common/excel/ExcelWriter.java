@@ -56,12 +56,12 @@ public class ExcelWriter {
         if (enableHeader != null) {
             startRow = 1;
             Row header = sheet.createRow(0);
-            writeHeader(header,FieldParseUtil.parseHeader(clazz));
+            writeHeader(header, FieldParseUtil.parseHeader(clazz));
         }
 
         int length = list.size();
-        for (int i = startRow; i < length + startRow; i++) {
-            Row row = sheet.createRow(i);
+        for (int i = 0; i < length; i++) {
+            Row row = sheet.createRow(i + startRow);
             T t = list.get(i);
             System.out.println("v:" + t);
             summaryMapper.forEach((key, value) -> {
@@ -221,8 +221,8 @@ public class ExcelWriter {
         }
     }
 
-    private void writeHeader(Row row, List<String> headers){
-        for (int i = 0; i< headers.size();i++){
+    private void writeHeader(Row row, List<String> headers) {
+        for (int i = 0; i < headers.size(); i++) {
             Cell cell = row.createCell(i);
             cell.setCellStyle(getCellStyle());
             cell.setCellType(CellType.STRING);

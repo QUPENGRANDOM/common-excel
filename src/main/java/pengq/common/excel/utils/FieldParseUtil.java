@@ -90,15 +90,16 @@ public class FieldParseUtil {
         Field[] fields = FieldUtil.getFields(clazz);
         String[] array = new String[fields.length];
         Arrays.fill(array, "");
-        List<String> headers = new ArrayList<>(Arrays.asList(array));
+
         for (Field field : fields) {
             WriteCell writeCellAnnotation = field.getAnnotation(WriteCell.class);
             if (writeCellAnnotation == null) {
                 continue;
             }
-            headers.add(writeCellAnnotation.header());
+            EXCell exCell = writeCellAnnotation.writeCell();
+            array[EXCellUtil.getCellNumber(exCell)]= writeCellAnnotation.header();
         }
 
-        return headers;
+        return  new ArrayList<>(Arrays.asList(array));
     }
 }
